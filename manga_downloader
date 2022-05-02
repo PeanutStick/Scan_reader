@@ -8,7 +8,6 @@ if [ "$1" ]; then
 else 
 	name=$(dmenu -p "Manga name: " <&-)
 fi
-#name="chainsaw-man"
 #url='https://scansmangas.ws/scans/'
 error_size=$(curl -so /dev/null "https://scansmangas.ws/scans/$name/99999/99999.jpg" -w '%{size_download}')
 
