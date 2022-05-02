@@ -1,0 +1,53 @@
+#!/bin/bash
+dir="/hdd/mangas/"
+cd $dir
+chapitre=1
+page=1
+if [ "$1" ]; then
+	name=$1
+else 
+	name=$(dmenu -p "Manga name: " <&-)
+fi
+#name="chainsaw-man"
+#url='https://scansmangas.ws/scans/'
+error_size=$(curl -so /dev/null "https://scansmangas.ws/scans/$name/99999/99999.jpg" -w '%{size_download}')
+
+
+#############################
+# Download the chapter
+#############################
+function chapitre_download () 
+{
+while true
+do
+	# $1 is the number without 0, for curl
+	# $2 is the chapitre with the 0, for the directorys
+	npage=$(printf "%03d" $page)
+	curl https://scansmangas.ws/scans/$name/$1/$page.jpg -o "$name/$2/$npage.jpg" -s
+	((page=page+1))
+	size=$(wc -c <"$name/$2/$npage.jpg")
+	echo "Size: $(du -hs $name) --- Threads: $(ps -aux | grep curl | wc -l)"
+	if [ "$size" = "$error_size" ]; then
+		rm $name/$2/$npage.jpg 2>/dev/null
+		break
+	fi
+done
+}
+
+
+#############################
+# Check if the chapter exist
+#############################
+while true
+do
+	a=$(curl -so /dev/null "https://scansmangas.ws/scans/$name/$chapitre/1.jpg" -w '%{size_download}')
+	if [ "$a" = "$error_size" ]; then
+		break
+	else
+		nchap=$(printf "%03d" $chapitre)
+		mkdir -p $name/$nchap
+		chapitre_download $chapitre $nchap &
+		((chapitre=chapitre+1))
+
+	fi
+done

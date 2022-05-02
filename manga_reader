@@ -1,0 +1,49 @@
+#!/bin/bash
+clear
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+dir="/hdd/mangas"
+cd $dir
+for d in */ ; do
+		
+	manga=$(echo "$d" | sed 's/.$//') # Get folder name
+	mangalist[${#mangalist[@]}]="$manga" # Add it to the list
+	if [ -f "$d/current.txt" ]; then 
+		current=$(cat $d/current.txt) # If file exist
+	else
+		current="000/000"
+	fi	
+	currentlist[${#currentlist[@]}]="$current"
+done
+# Display the menu to select the manga
+i=0
+for manga in "${mangalist[@]}"
+do
+	((i+=1))
+	if [[ ${currentlist[$i-1]} == "000/000" ]];then
+		
+		echo -e "$i: ${RED}$manga${NC} is ${RED}New${NC}."
+	else
+		echo -e "$i: ${RED}$manga${NC} Chapter ${RED}${currentlist[$i-1]}${NC}."
+	fi
+done
+read -p "Select the manga [1-$i]: " choise
+lchoise=${#choise}
+echo $lchoise
+if (($lchoise <= 0)); then
+       echo "Invalid input"       
+elif (($choise >= 1 && $choise <= $i)); then
+	selected_manga=${mangalist[$choise-1]}
+	save=$(sxiv -t -a -o $selected_manga/* | grep -o -P '(?<=/).*(?=.jpg)' | tail -n1)
+	echo $save > $selected_manga/current.txt
+else
+	echo "Not ok"
+fi
+
+
+
+
+
+
+
+
