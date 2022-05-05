@@ -1,0 +1,104 @@
+#!/bin/bash
+dir="/hdd/mangas"
+cd $dir
+chapter=1
+name=$1
+# Curl on the page
+choose_manga=$(curl --silent https://ww3.mangakakalot.tv/search/$name |grep 'nofollow' | grep '/manga/manga-' |grep '/a')
+i=1
+# Save the curl request, One to select the manga, one to get the ID
+names=$(echo "$choose_manga" | cut -c70- | sed 's+</a>++')
+rawnames=$(echo "$choose_manga")
+
+function chapitre_download ()
+{
+############################
+# Page
+############################
+while read page; 
+do 
+	npage=$(printf "%03d" $u)
+	curl $page -o $manga_name/$1/$npage.jpg -s 
+	echo "Chapter $i Page $u: Size: $(du -hs $manga_name)"
+	u=$((u+1))
+done < <(echo "$pages")
+}
+##########################
+# Display the name
+##########################
+while read line; 
+do 
+	echo "$i: ${line}"
+       	#namelist+=(${line// /_})
+	((i=i+1)); 
+done < <(echo "$names")
+((i=i-1))
+
+#########################
+# Select the manga
+#########################
+
+read -p "Select the manga [1-$i]: " choise
+if (($choise <= 0)); then
+       echo "No input"
+elif (($choise >= 1 && $choise <= $i)); then
+########################
+# Name for ID
+########################
+	while read line; 
+	do 
+		namelist+=(${line// /_})
+		((i=i+1)); 
+	done < <(echo "$rawnames")
+#######################
+# Name for user
+#######################
+	while read line; 
+	do 
+		nameslist+=(${line// /_})
+		((i=i+1)); 
+	done < <(echo "$names")
+	# Get the ID
+	manga_id=$(echo ${namelist[$choise-1]} |grep -o -P '(?<=nga-).*(?=")')
+	manga_name=${nameslist[$choise-1]}
+else
+ 	echo "Not ok"
+fi
+error_size=$(curl -so /dev/null "https://ww3.mangakakalot.tv/chapter/manga-$manga_id/chapter-0" -w '%{size_download}')
+
+i=1
+while true
+do
+	chaptest=$(curl -so /dev/null "https://ww3.mangakakalot.tv/chapter/manga-$manga_id/chapter-$i" -w '%{size_download}')
+############################
+# Check if the chapter exist
+############################
+	if [ "$chaptest" = "$error_size" ]; then
+		echo "Same size"
+		break
+	else
+
+############################
+# Chapter
+############################
+		pages=$(curl --silent https://ww3.mangakakalot.tv/chapter/manga-$manga_id/chapter-$i |grep -o -P '(?<=data-src=").*(?=" class)')
+		u=1
+
+		nchap=$(printf "%03d" $i)
+		echo $nchap
+		mkdir -p $manga_name/$nchap
+		chapitre_download $nchap &
+		i=$((i+1))
+		
+	fi
+done
+
+
+
+
+
+
+
+
+
+
