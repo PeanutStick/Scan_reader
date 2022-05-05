@@ -8,9 +8,27 @@ if [ "$1" ]; then
 else 
 	name=$(dmenu -p "Manga name: " <&-)
 fi
+#name="chainsaw-man"
 #url='https://scansmangas.ws/scans/'
-error_size=$(curl -so /dev/null "https://scansmangas.ws/scans/$name/99999/99999.jpg" -w '%{size_download}')
 
+#############################
+# Test the website
+#############################
+error_size=$(curl -so /dev/null "https://scansmangas.ws/scans/$name/99999/99999.jpg" -w '%{size_download}')
+scanmangas=$(curl -so /dev/null "https://scansmangas.ws/scans/$name/1/1.jpg" -w '%{size_download}')
+if [ "$scanmangas" = "$error_size" ]; then
+	echo "Not available on scansmangas.ws"
+	sh mangakakalot $name
+
+
+else
+	echo "It's on scansmangas.ws"
+fi
+
+
+
+#curl https://ww3.mangakakalot.tv/chapter/manga-da981209/chapter-51 |grep 'cm.blazefast.co|lazyimage' Pick the images
+#curl https://ww3.mangakakalot.tv/search/Moshi%20Fanren |grep -o -P '(?<=manga-).*(?=">Moshi Fanren)' Pick the number of the manga
 
 #############################
 # Download the chapter
