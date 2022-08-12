@@ -64,12 +64,12 @@ elif (($choise >= 1 && $choise <= $i)); then
 else
  	echo "Not ok"
 fi
-error_size=$(curl -so /dev/null "https://ww3.mangakakalot.tv/chapter/manga-$manga_id/chapter-0" -w '%{size_download}')
+error_size=$(curl -so /dev/null "https://ww4.mangakakalot.tv/chapter/manga-$manga_id/chapter-0" -w '%{size_download}')
 
 i=1
 while true
 do
-	chaptest=$(curl -so /dev/null "https://ww3.mangakakalot.tv/chapter/manga-$manga_id/chapter-$i" -w '%{size_download}')
+	chaptest=$(curl -so /dev/null "https://ww4.mangakakalot.tv/chapter/manga-$manga_id/chapter-$i" -w '%{size_download}')
 ############################
 # Check if the chapter exist
 ############################
@@ -81,7 +81,7 @@ do
 ############################
 # Chapter
 ############################
-		pages=$(curl --silent https://ww3.mangakakalot.tv/chapter/manga-$manga_id/chapter-$i |grep -o -P '(?<=data-src=").*(?=" class)')
+		pages=$(curl --silent https://ww4.mangakakalot.tv/chapter/manga-$manga_id/chapter-$i |grep -o -P '(?<=data-src=").*(?=" class)')
 		u=1
 
 		nchap=$(printf "%03d" $i)
