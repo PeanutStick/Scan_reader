@@ -4,7 +4,7 @@ cd $dir
 chapter=1
 name=$1
 # Curl on the page
-choose_manga=$(curl --silent https://ww3.mangakakalot.tv/search/$name |grep 'nofollow' | grep '/manga/manga-' |grep '/a')
+choose_manga=$(curl --silent https://ww4.mangakakalot.tv/search/$name |grep 'nofollow' | grep '/manga/manga-' |grep '/a')
 i=1
 # Save the curl request, One to select the manga, one to get the ID
 names=$(echo "$choose_manga" | cut -c70- | sed 's+</a>++')
